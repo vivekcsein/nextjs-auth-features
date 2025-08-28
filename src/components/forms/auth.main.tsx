@@ -48,7 +48,6 @@ export const SigninForm = () => {
     console.log("Signin submitted:", data);
     try {
       const response = await loginAPI(data as SchemaType<"signin">);
-      console.log("Login response:", response);
       if (response?.status === "success") {
         // Optionally redirect to login page and send a toaster message
         if (response?.data) {

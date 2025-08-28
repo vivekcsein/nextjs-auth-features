@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axiosInstance.post("/auth/refresh"); // Refresh token via cookie
+        await axiosInstance.post("/auth/profile"); // Refresh token via cookie
         processQueue();
         return axiosInstance(originalRequest);
       } catch (refreshError) {
