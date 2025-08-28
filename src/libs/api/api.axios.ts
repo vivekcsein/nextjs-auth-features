@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error("Refresh failed:", refreshError);
-        window.location.href = "/login"; // Optional: redirect to login
+        window.location.href = "/signin"; // Optional: redirect to login
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

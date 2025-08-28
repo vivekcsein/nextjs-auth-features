@@ -14,6 +14,10 @@ import {
   forgetPasswordSchema,
   updatePasswordSchema,
 } from "@/libs/schemas/schema.auth";
+import { loginAPI, registerAPI } from "@/libs/api/api.auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../providers/AuthContext";
 
 // 🔐 Schema Map
 export const schemaMap = {
@@ -37,9 +41,29 @@ export const SigninForm = () => {
     control,
     formState: { errors, isSubmitting },
   } = InstanceUseAuthForm("signin");
+  const router = useRouter();
+  const { setUser, setIsAuthenticated } = useAuth();
 
-  const onSubmit = (data: SchemaType<SchemaKey>): void => {
+  const onSubmit = async (data: SchemaType<SchemaKey>): Promise<void> => {
     console.log("Signin submitted:", data);
+    try {
+      const response = await loginAPI(data as SchemaType<"signin">);
+      console.log("Login response:", response);
+      if (response?.status === "success") {
+        // Optionally redirect to login page and send a toaster message
+        if (response?.data) {
+          router.push("/");
+          setUser(response.data);
+          setIsAuthenticated(true);
+          toast.success(response.message);
+        }
+      }
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : "Unexpected error occurred";
+      // console.log("❌ API error:", errMsg);
+      toast.error(errMsg);
+    }
   };
 
   return (
@@ -76,9 +100,28 @@ export const SignupForm = () => {
     control,
     formState: { errors, isSubmitting },
   } = InstanceUseAuthForm("signup");
+  const router = useRouter();
 
-  const onSubmit = (data: SchemaType<SchemaKey>) => {
+  const onSubmit = async (data: SchemaType<SchemaKey>) => {
     console.log("Signin submitted:", data);
+    try {
+      // Remove confirmPassword before sending to backend
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword: _confirmPassword, ...payload } =
+        data as SchemaType<"signup">;
+      const response = await registerAPI(payload);
+      if (response?.status === "success") {
+        // Optionally redirect to login page and send a toaster message
+        if (response?.data) {
+          router.push("/signin");
+        }
+        toast.success(response.message);
+      }
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : "Unexpected error occurred";
+      console.error("❌ API error:", errMsg);
+    }
   };
 
   return (
