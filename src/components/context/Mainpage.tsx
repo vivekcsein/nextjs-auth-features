@@ -1,15 +1,26 @@
 "use client";
-
 import React from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "../ui/shadcn/button";
 import { useAuth } from "../providers/AuthContext";
+import { logoutAPI } from "@/libs/api/api.auth";
 
 const Mainpage = () => {
   const { isAuthenticated, user, setIsAuthenticated, setUser } = useAuth();
   const sendToast = (message: string) => {
     toast(message);
+  };
+
+  const LoggedOut = async () => {
+    const response = await logoutAPI();
+    if (response?.status === "success") {
+      sendToast("User is signed Out");
+      setIsAuthenticated(false);
+      setUser(null);
+    } else {
+      toast.error("Failed to sign out");
+    }
   };
   return (
     <>
@@ -22,9 +33,7 @@ const Mainpage = () => {
           </p>
           <Button
             onClick={() => {
-              sendToast("User is signed Out");
-              setIsAuthenticated(false);
-              setUser(null);
+              LoggedOut();
             }}
             variant={"gradient"}
           >

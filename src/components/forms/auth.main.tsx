@@ -51,10 +51,10 @@ export const SigninForm = () => {
       if (response?.status === "success") {
         // Optionally redirect to login page and send a toaster message
         if (response?.data) {
-          router.push("/");
           setUser(response.data);
           setIsAuthenticated(true);
           toast.success(response.message);
+          router.push("/");
         }
       }
     } catch (error: unknown) {
