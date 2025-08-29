@@ -44,7 +44,7 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log("🔄 Attempting token refresh...");
+        // console.log("🔄 Attempting token refresh...");
         await axiosInstance.post("/auth/refresh", {
           remember: localStorage.getItem("remember"),
         }); // Refresh token via cookie

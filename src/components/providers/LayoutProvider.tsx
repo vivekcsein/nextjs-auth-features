@@ -1,8 +1,8 @@
 "use client";
 import { toast, Toaster } from "sonner";
 import React, { useEffect } from "react";
-import { getUserProfileAPI } from "@/libs/api/api.auth";
 import { useAuth } from "./AuthContext";
+import { getUserProfileAPI } from "@/libs/api/api.auth";
 interface LayoutProviderProps {
   children: React.ReactNode;
 }
@@ -13,7 +13,6 @@ const LayoutProvider = ({ children }: LayoutProviderProps) => {
     const getUserProfile = async () => {
       try {
         const response = await getUserProfileAPI();
-
         if (!response?.status || !response?.data) {
           toast.error("Failed to fetch profile");
           setIsAuthenticated(false);
