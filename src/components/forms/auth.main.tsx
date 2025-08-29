@@ -54,6 +54,9 @@ export const SigninForm = () => {
           setUser(response.data);
           setIsAuthenticated(true);
           toast.success(response.message);
+          const loginData = data as SchemaType<"signin">;
+          const remember = !!loginData.remember; // Coerces to boolean, defaults to false
+          localStorage.setItem("remember", remember.toString());
           router.push("/");
         }
       }

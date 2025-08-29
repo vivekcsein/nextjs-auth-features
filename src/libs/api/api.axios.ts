@@ -1,20 +1,18 @@
 import axios from "axios";
 
-// Replace with actual backend URL
 const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:7164/api";
 
 const axiosInstance = axios.create({
-  baseURL: baseURL,
-  withCredentials: true, // Send cookies cross-origin
+  baseURL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Flag to prevent infinite refresh loops
 let isRefreshing = false;
-let failedQueue: Array<() => void> = [];
+let failedQueue: Array<(token?: string) => void> = [];
 
 const processQueue = () => {
   failedQueue.forEach((cb) => cb());
@@ -26,7 +24,16 @@ axiosInstance.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config;
 
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    // Prevent retrying the refresh endpoint itself
+    const isRefreshCall = originalRequest.url?.includes("/auth/refresh", {
+      remember: localStorage.getItem("remember"),
+    });
+
+    if (
+      err.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isRefreshCall
+    ) {
       if (isRefreshing) {
         return new Promise((resolve) => {
           failedQueue.push(() => resolve(axiosInstance(originalRequest)));
@@ -37,11 +44,14 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axiosInstance.post("/auth/profile"); // Refresh token via cookie
+        console.log("🔄 Attempting token refresh...");
+        await axiosInstance.post("/auth/refresh", {
+          remember: localStorage.getItem("remember"),
+        }); // Refresh token via cookie
         processQueue();
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error("Refresh failed:", refreshError);
+        console.error("❌ Refresh failed:", refreshError);
         window.location.href = "/signin"; // Optional: redirect to login
         return Promise.reject(refreshError);
       } finally {

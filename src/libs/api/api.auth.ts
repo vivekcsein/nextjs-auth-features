@@ -43,3 +43,10 @@ export const getUserProfileAPI = async (): Promise<AuthResponse> => {
   const response = await axiosInstance.post<AuthResponse>("/auth/profile");
   return response.data;
 };
+
+export const getAccessTokenAPI = async (): Promise<AuthResponse> => {
+  const response = await axiosInstance.post<AuthResponse>("/auth/refresh", {
+    remember: localStorage.getItem("remember"),
+  });
+  return response.data;
+};
