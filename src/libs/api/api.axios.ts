@@ -25,7 +25,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = err.config;
 
     // Prevent retrying the refresh endpoint itself
-    const isRefreshCall = originalRequest.url?.includes("/auth/refresh", {
+    const isRefreshCall = originalRequest.url?.includes("/auth/profile", {
       remember: localStorage.getItem("remember"),
     });
 
