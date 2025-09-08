@@ -1,57 +1,59 @@
 "use client";
-import React from "react";
 import Link from "next/link";
-import { toast } from "sonner";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/shadcn/button";
 import { useAuth } from "../providers/AuthContext";
-import { logoutAPI } from "@/libs/api/api.auth";
 
 const Mainpage = () => {
-  const { isAuthenticated, user, setIsAuthenticated, setUser } = useAuth();
-  const sendToast = (message: string) => {
-    toast(message);
-  };
+  const { isAuthenticated, user, signoutUser, loading } = useAuth();
+  const router = useRouter();
 
-  const LoggedOut = async () => {
-    const response = await logoutAPI();
-    if (response?.status === "success") {
-      sendToast("User is signed Out");
-      setIsAuthenticated(false);
-      setUser(null);
-    } else {
-      toast.error("Failed to sign out");
-    }
-  };
+  // Refresh route when auth state changes
+  useEffect(() => {
+    router.refresh();
+  }, [isAuthenticated, router]);
+
+  if (loading) {
+    return <p className="text-center mt-4">Loading...</p>;
+  }
+
   return (
-    <>
+    <div className="text-center">
       <h1 className="text-2xl font-bold">Welcome to the Next.js Auth App</h1>
 
       {isAuthenticated ? (
         <>
-          <p className="mt-4 text-center pb-4">
+          <p className="mt-4 pb-4">
             Welcome {user?.fullname}, please sign out to continue.
           </p>
-          <Button
-            onClick={() => {
-              LoggedOut();
-            }}
-            variant={"gradient"}
-          >
-            SignOut
-          </Button>
+          <div className="flex gap-4 justify-center items-center">
+            <Button onClick={signoutUser} variant="gradient">
+              Sign Out
+            </Button>
+            <Button
+              onClick={() => {
+                router.push("/profile");
+              }}
+              variant="gradient"
+              className="px-6 py-4"
+            >
+              Profile
+            </Button>
+          </div>
         </>
       ) : (
         <>
-          <p className="mt-4 text-center">Please sign in to continue.</p>
+          <p className="mt-4">Please sign in to continue.</p>
           <Link
-            href={"/signin"}
-            className="mt-4 text-center bg-primary px-4 py-2 rounded text-white hover:bg-primary/90 transition"
+            href="/signin"
+            className="mt-4 inline-block bg-primary px-4 py-2 rounded text-white hover:bg-primary/90 transition"
           >
             Sign In
           </Link>
         </>
       )}
-    </>
+    </div>
   );
 };
 

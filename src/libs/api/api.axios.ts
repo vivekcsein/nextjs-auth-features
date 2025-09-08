@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:7164/api";
@@ -25,7 +26,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = err.config;
 
     // Prevent retrying the refresh endpoint itself
-    const isRefreshCall = originalRequest.url?.includes("/auth/profile", {
+    const isRefreshCall = originalRequest.url?.includes("/auth/refresh", {
       remember: localStorage.getItem("remember"),
     });
 
@@ -51,8 +52,9 @@ axiosInstance.interceptors.response.use(
         processQueue();
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error("❌ Refresh failed:", refreshError);
-        window.location.href = "/signin"; // Optional: redirect to login
+        if (process.env.NODE_ENV === "development") {
+          console.error("❌ Refresh failed:", refreshError);
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -62,5 +64,21 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+type AuthErrorResponse = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
+export const handleErrorMessage = (error: unknown): string => {
+  const maybeResponse = error as AuthErrorResponse;
+  toast.error(
+    maybeResponse?.response?.data?.message ?? "Unexpected error occurred"
+  );
+  return maybeResponse?.response?.data?.message ?? "Unexpected error occurred";
+};
 
 export default axiosInstance;

@@ -13,13 +13,13 @@ export interface User {
   updated_at: string;
 }
 
-export interface RegisterPayload {
+export interface RegisterFormPayload {
   email: string;
   password: string;
   fullname: string;
 }
 
-export interface LoginPayload {
+export interface LoginFormPayload {
   email: string;
   password: string;
 }
@@ -32,18 +32,13 @@ export interface ContactFormPayload {
   newsletter?: boolean;
 }
 
-export interface AuthResponse {
-  status: "success" | "failed";
-  data?: User;
+export interface apiResponse {
+  success: boolean;
   message: string;
-  error?: unknown;
 }
 
-export interface LogoutResponse {
-  status: "success" | "failed";
-  message: string;
-}
-export interface ContactFormResponse {
-  status: "success" | "failed";
-  message: string;
+export interface AuthResponse extends apiResponse {
+  status?: "success" | "error";
+  data?: User | null;
+  error?: unknown;
 }
