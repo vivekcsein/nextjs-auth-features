@@ -1,10 +1,10 @@
 "use client";
 import z from "zod";
 import AuthForm from "@/libs/forms/form.auth";
-import { useAuth } from "../providers/AuthContext";
 import { Card } from "@/components/ui/shadcn/card";
 import { Button } from "@/components/ui/shadcn/button";
 import { FormTemplate, InstanceUseAuthForm } from "./auth.form";
+import { useSession } from "@/components/providers/AuthProvider";
 
 import {
   signinSchema,
@@ -38,7 +38,7 @@ export const SigninForm = () => {
     control,
     formState: { errors, isSubmitting },
   } = InstanceUseAuthForm("signin");
-  const { signinUser } = useAuth();
+  const { signinUser } = useSession();
 
   const onSubmit = async (data: SchemaType<SchemaKey>): Promise<void> => {
     console.log("Signin submitted:", data);
@@ -79,7 +79,7 @@ export const SignupForm = () => {
     control,
     formState: { errors, isSubmitting },
   } = InstanceUseAuthForm("signup");
-  const { signupUser } = useAuth();
+  const { signupUser } = useSession();
 
   const onSubmit = async (data: SchemaType<SchemaKey>) => {
     console.log("Signin submitted:", data);

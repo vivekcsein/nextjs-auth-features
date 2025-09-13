@@ -46,7 +46,7 @@ export const getUserProfileAPI = async (): Promise<AuthResponse> => {
 
 export const getAccessTokenAPI = async (): Promise<AuthResponse> => {
   const response = await axiosInstance.post<AuthResponse>("/auth/refresh", {
-    remember: localStorage.getItem("remember"),
+    remember: localStorage.getItem("rememberme"),
   });
   return response.data;
 };

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { SigninForm } from "@/components/context/auth/auth.main";
+import { ResetPasswordForm } from "@/components/context/auth/auth.main";
 
-const SigninPage = () => {
+const ForgetPasswordPage = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Link
@@ -10,9 +10,9 @@ const SigninPage = () => {
       >
         Return to Homepage
       </Link>
-      <SigninForm />
+      <ResetPasswordForm />
     </div>
   );
 };
 
-export default SigninPage;
+export default ForgetPasswordPage;

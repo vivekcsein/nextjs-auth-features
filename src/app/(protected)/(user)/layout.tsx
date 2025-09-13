@@ -1,28 +1,40 @@
 "use client";
-import React, { useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/providers/AuthContext";
+import { useSession } from "@/components/providers/AuthProvider";
 
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
+  const { isAuthenticated, user, isLoading } = useSession();
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      const timeout = setTimeout(() => {
-        router.push("/signin");
-      }, 3000);
-
-      return () => clearTimeout(timeout); // Cleanup to avoid memory leaks
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace("/signin");
+      } else if (user?.role !== "USER") {
+        setShouldRender(false);
+      } else {
+        setShouldRender(true);
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, user, router]);
 
-  if (!isAuthenticated) {
-    return <div>Not authenticated. Redirecting to sign-in...</div>;
+  if (isLoading) {
+    return null; // Prevent flicker during session resolution
   }
 
   if (isAuthenticated && user?.role !== "USER") {
-    return <div>You dont have access to these pages...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-center text-lg font-semibold text-red-600">
+        🚫 You don&apos;t have access to these pages.
+      </div>
+    );
+  }
+
+  if (!shouldRender) {
+    return null;
   }
 
   return <>{children}</>;

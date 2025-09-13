@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
 
     // Prevent retrying the refresh endpoint itself
     const isRefreshCall = originalRequest.url?.includes("/auth/refresh", {
-      remember: localStorage.getItem("remember"),
+      remember: localStorage.getItem("rememberme"),
     });
 
     if (
@@ -47,7 +47,7 @@ axiosInstance.interceptors.response.use(
       try {
         // console.log("🔄 Attempting token refresh...");
         await axiosInstance.post("/auth/refresh", {
-          remember: localStorage.getItem("remember"),
+          remember: localStorage.getItem("rememberme"),
         }); // Refresh token via cookie
         processQueue();
         return axiosInstance(originalRequest);

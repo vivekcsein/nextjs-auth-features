@@ -1,8 +1,16 @@
 "use client";
-// import z from "zod";
 import clsx from "clsx";
 import { useMemo } from "react";
 import AuthForm, { FormInputType, FormListType } from "@/libs/forms/form.auth";
+
+import { Input } from "@/components/ui/shadcn/input";
+import { Label } from "@/components/ui/shadcn/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/shadcn/textarea";
+import InputSelect from "@/components/ui/inputs/InputSelect";
+import InputCheckbox from "@/components/ui/inputs/InputCheckbox";
+import InputCalender from "@/components/ui/inputs/InputCalender";
+import InputPassword from "@/components/ui/inputs/InputPassword";
 
 import {
   Control,
@@ -10,16 +18,6 @@ import {
   useForm,
   UseFormRegister,
 } from "react-hook-form";
-
-import { Input } from "@/components/ui/shadcn/input";
-import { Label } from "@/components/ui/shadcn/label";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Textarea } from "@/components/ui/shadcn/textarea";
-// import Lucid_Icon from "@/components/ui/helper/Lucid_Icon";
-import InputSelect from "@/components/ui/inputs/InputSelect";
-import InputCheckbox from "@/components/ui/inputs/InputCheckbox";
-import InputCalender from "@/components/ui/inputs/InputCalender";
-import InputPassword from "@/components/ui/inputs/InputPassword";
 
 import {
   CardContent,
@@ -32,10 +30,10 @@ import { SchemaKey, schemaMap, SchemaType } from "./auth.main";
 
 // 🧠 Default Values
 const defaultAuthValues: Record<string, string | boolean> = {
-  fullname: "Full Name",
-  email: "user@gmail.com",
-  password: "Password#123",
-  confirmPassword: "Password#123",
+  fullname: "John Doe",
+  email: "johndoe@gmail.com",
+  password: "JohnDoe#123",
+  confirmPassword: "JohnDoe#123",
   remember: false,
   agreeToTerms: false,
 };
@@ -83,8 +81,7 @@ export const FormTemplate = ({
     <>
       <CardHeader className="flex justify-between items-center md:min-w-xl">
         <CardTitle className="flex items-center gap-2">
-          {/* <Lucid_Icon className="h-5 w-5" iconName={formList.icon} /> */}
-          {formList.title}
+          Welcome to {formList.title}
         </CardTitle>
         {referTo && referTo.link && (
           <Label

@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/providers/AuthContext";
+import { useSession } from "@/components/providers/AuthProvider";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -12,17 +12,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       const timeout = setTimeout(() => {
         router.push("/signin");
       }, 3000);
-
-      return () => clearTimeout(timeout); // Cleanup to avoid memory leaks
+      return () => clearTimeout(timeout);
     }
-  }, [isAuthenticated, router]);
+
+    if (isAuthenticated && user?.role !== "ADMIN") {
+      const timeout = setTimeout(() => {
+        router.push("/unauthorized"); // You can create this page to show a proper message
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isAuthenticated, user, router]);
 
   if (!isAuthenticated) {
     return <div>Not authenticated. Redirecting to sign-in...</div>;
   }
 
-  if (isAuthenticated && user?.role !== "ADMIN") {
-    return <div>You dont have access to these pages...</div>;
+  if (user?.role !== "ADMIN") {
+    return <div>Access denied. Redirecting...</div>;
   }
 
   return <>{children}</>;

@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "@/components/providers/AuthContext";
 import LayoutProvider from "@/components/providers/LayoutProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     "next.js auth template",
     "next.js authentication boilerplate",
   ],
-  authors: [{ name: "sparkverse", url: "https://sparkverse.in" }],
+  authors: [{ name: "vivekcsein", url: "https://vivekcse.in" }],
   creator: "vivekcsein",
 };
 

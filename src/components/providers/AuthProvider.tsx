@@ -1,34 +1,35 @@
 "use client";
+
 import { User } from "@/types/auth";
 import { useRouter } from "next/navigation";
-import { SchemaType } from "../forms/auth.main";
 import { sendToast } from "@/libs/utils/utils.app";
+import { SchemaType } from "../context/auth/auth.main";
+import { handleErrorMessage } from "@/libs/api/api.axios";
 
 import React, {
-  createContext,
-  useContext,
-  useState,
-  useMemo,
-  useEffect,
   useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useContext,
+  createContext,
 } from "react";
 
 import {
-  getUserProfileAPI,
   loginAPI,
   logoutAPI,
   registerAPI,
+  getUserProfileAPI,
 } from "@/libs/api/api.auth";
-import { handleErrorMessage } from "@/libs/api/api.axios";
 
 type AuthContextType = {
   user: User | null;
-  loading: boolean;
+  isLoading: boolean;
   isAuthenticated: boolean;
   signoutUser: () => Promise<void>;
+  getUserProfile: () => Promise<void>;
   signinUser: (data: SchemaType<"signin">) => Promise<void>;
   signupUser: (data: SchemaType<"signup">) => Promise<void>;
-  getUserProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,111 +38,111 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const hasFetchedRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const resetUser = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+  };
 
   const getUserProfile = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await getUserProfileAPI();
 
       if (!response?.success || !response?.data) {
-        sendToast("Failed to fetch profile", true);
-        setIsAuthenticated(false);
-        setUser(null);
-        return;
+        throw new Error("Invalid session or missing user data");
       }
 
       setUser(response.data);
       setIsAuthenticated(true);
-      // sendToast(`Welcome back ${response.data.fullname}!`);
     } catch (error) {
-      console.error("Profile fetch error:", error);
-      setUser(null);
-      setIsAuthenticated(false);
-      sendToast("Session expired or invalid", true);
+      if (process.env.NODE_ENV === "development") {
+        console.error("getUserProfile error:", error);
+      }
+      resetUser();
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     if (!hasFetchedRef.current) {
-      hasFetchedRef.current = true; // ✅ Ensures fetch runs only once
+      hasFetchedRef.current = true;
       getUserProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signupUser = async (data: SchemaType<"signup">) => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       const response = await registerAPI(data);
 
       if (!response) {
-        sendToast("No response from server");
-        return;
+        throw new Error("No response from server");
       }
 
       const { success, message, data: userData } = response;
 
       if (success && userData) {
-        setIsAuthenticated(true);
         setUser(userData);
+        setIsAuthenticated(true);
         sendToast(message || "Sign up successful");
         router.push("/signin");
       } else {
-        sendToast(message || "Failed to sign up");
+        throw new Error(message || "Failed to sign up");
       }
     } catch (error) {
       handleErrorMessage(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const signinUser = async (data: SchemaType<"signin">) => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       const response = await loginAPI(data);
 
       if (!response) {
-        sendToast("No response from server", true);
-        return;
+        throw new Error("No response from server");
       }
 
       const { success, message, data: userData } = response;
 
       if (success && userData) {
-        setIsAuthenticated(true);
         setUser(userData);
+        setIsAuthenticated(true);
 
         if (data.remember !== undefined) {
-          localStorage.setItem("remember", String(data.remember));
+          localStorage.setItem("rememberme", String(data.remember));
         }
 
         sendToast(message || "Sign in successful");
         router.push("/");
       } else {
-        sendToast(message || "Failed to sign in");
+        throw new Error(message || "Failed to sign in");
       }
     } catch (error) {
       handleErrorMessage(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const signoutUser = async () => {
     try {
       const response = await logoutAPI();
+
       if (response?.success) {
-        setIsAuthenticated(false);
-        setUser(null);
+        resetUser();
         sendToast("Signed out successfully");
       } else {
-        sendToast(response?.message ?? "Failed to sign out");
+        throw new Error(response?.message ?? "Failed to sign out");
       }
     } catch (error) {
       handleErrorMessage(error);
@@ -151,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const value = useMemo(
     () => ({
       user,
-      loading,
+      isLoading,
       isAuthenticated,
       signupUser,
       signinUser,
@@ -159,14 +160,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       getUserProfile,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, loading, isAuthenticated]
+    [user, isLoading, isAuthenticated]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useSession = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (!context) {
+    throw new Error("useSession must be used within AuthProvider");
+  }
   return context;
 };

@@ -11,6 +11,8 @@ export interface User {
   role: IUserProfileRoleType;
   created_at: string;
   updated_at: string;
+  isUserVerified?: boolean;
+  tokenExpiresIn?: number;
 }
 
 export interface RegisterFormPayload {
