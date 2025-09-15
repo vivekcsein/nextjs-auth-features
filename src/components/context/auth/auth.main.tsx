@@ -36,9 +36,9 @@ export const SigninForm = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = InstanceUseAuthForm("signin");
-  const { signinUser } = useSession();
+  const { signinUser, isLoading } = useSession();
 
   const onSubmit = async (data: SchemaType<SchemaKey>): Promise<void> => {
     console.log("Signin submitted:", data);
@@ -59,10 +59,10 @@ export const SigninForm = () => {
           <Button
             type="submit"
             variant="gradient"
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="cursor-pointer bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition"
           >
-            {isSubmitting
+            {isLoading
               ? AuthForm.signin.submit?.onSubmitLabel
               : AuthForm.signin.submit?.label}
           </Button>
@@ -77,9 +77,9 @@ export const SignupForm = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = InstanceUseAuthForm("signup");
-  const { signupUser } = useSession();
+  const { signupUser, isLoading } = useSession();
 
   const onSubmit = async (data: SchemaType<SchemaKey>) => {
     console.log("Signin submitted:", data);
@@ -100,10 +100,10 @@ export const SignupForm = () => {
           <Button
             type="submit"
             variant="gradient"
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition"
           >
-            {isSubmitting
+            {isLoading
               ? AuthForm.signup.submit?.onSubmitLabel
               : AuthForm.signup.submit?.label}
           </Button>

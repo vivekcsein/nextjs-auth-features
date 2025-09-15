@@ -9,17 +9,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      const timeout = setTimeout(() => {
-        router.push("/signin");
-      }, 3000);
-      return () => clearTimeout(timeout);
+      router.push("/signin");
     }
 
     if (isAuthenticated && user?.role !== "ADMIN") {
-      const timeout = setTimeout(() => {
-        router.push("/unauthorized"); // You can create this page to show a proper message
-      }, 3000);
-      return () => clearTimeout(timeout);
+      router.push("/"); // You can create this page to show a proper message
     }
   }, [isAuthenticated, user, router]);
 

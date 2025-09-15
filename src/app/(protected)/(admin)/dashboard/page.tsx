@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/shadcn/button";
 import { useSession } from "@/components/providers/AuthProvider";
 
-const AdminPage = () => {
+const DashboardPage = () => {
   const { user } = useSession();
   const router = useRouter();
   return (
@@ -36,4 +36,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default DashboardPage;

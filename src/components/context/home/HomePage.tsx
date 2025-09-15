@@ -77,7 +77,10 @@ const HomePage = () => {
               Please sign in to continue.
             </p>
             <Link href="/signin">
-              <Button variant="default" className="mt-4 px-6 py-3">
+              <Button
+                variant="default"
+                className="mt-4 px-6 py-3 cursor-pointer"
+              >
                 Sign In
               </Button>
             </Link>
